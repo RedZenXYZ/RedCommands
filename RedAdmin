@@ -15,6 +15,23 @@ _G.WaitForAdmin.Chatted:Connect(function(msg)
 	SendCommand(lowCom)
 end)
 
+function GetClapped(player)
+	local BV = Instance.new("BodyVelocity", localplr.Character:FindFirstChild("HumanoidRootPart"))
+	local BG = Instance.new("BodyGyro", localplr.Character:FindFirstChild("HumanoidRootPart"))
+	BG.MaxTorque = Vector3.new(0,0,0)
+	BG.D = 0
+	BG.P = 0
+	BG.CFrame = game:GetService("Workspace").CurrentCamera.CFrame
+	BV.MaxForce = Vector3.new(9999, 9999, 9999)
+	_G.Clap = true
+	while _G.Clap == true do wait()
+		localplr.Character:FindFirstChildOfClass("Humanoid").Sit = true
+		localplr.Character:FindFirstChild("HumanoidRootPart").CFrame = player.Character:FindFirstChild("HumanoidRootPart").CFrame * CFrame.new(0, 0, -3) * CFrame.Angles(-1.5, 0, 0)
+		wait()
+		localplr.Character:FindFirstChild("HumanoidRootPart").CFrame = player.Character:FindFirstChild("HumanoidRootPart").CFrame * CFrame.new(0, 0, -2) * CFrame.Angles(-1.5, 0, 0)
+	end
+end
+
 function GiveCom(Player)
 	Player.Chatted:Connect(function(msg)
 		lowCom = string.lower(msg)
@@ -28,7 +45,7 @@ function SendCommand(Com)
 		_G.Len = string.len(_G.Prefix)
 	elseif Com == _G.Prefix .. "kill" then
 		localplr.Character:FindFirstChildOfClass("Humanoid").Health = 0
-	elseif Com == _G.Prefix .. "goto" then
+	elseif string.sub(Com, 1, 2 + _G.Len) == _G.Prefix .. "to" then
 		for i,v in pairs(GetPlayer(string.sub(Com, 4 + _G.Len, 100))) do
 			localplr.Character:FindFirstChild("HumanoidRootPart").CFrame = game:GetService("Players")[v.Name].Character:FindFirstChild("HumanoidRootPart").CFrame
 		end
@@ -77,21 +94,9 @@ function SendCommand(Com)
 		for _, v in ipairs(Human:GetPlayingAnimationTracks()) do
 			v:Stop()
 		end
-	elseif Com == _G.Prefix .. "clap" then
-		game:GetService("Workspace").CurrentCamera.CameraSubject = game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-		local BV = Instance.new("BodyVelocity", game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart"))
-		local BG = Instance.new("BodyGyro", game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart"))
-		BG.MaxTorque = Vector3.new(0,0,0)
-		BG.D = 0
-		BG.P = 0
-		BG.CFrame = game:GetService("Workspace").CurrentCamera.CFrame
-		BV.MaxForce = Vector3.new(9999, 9999, 9999)
-		_G.Clap = true
-		while _G.Clap == true do wait()
-			localplr.Character:FindFirstChildOfClass("Humanoid").Sit = true
-			localplr.Character:FindFirstChild("HumanoidRootPart").CFrame = _G.WaitForAdmin.Character:FindFirstChild("HumanoidRootPart").CFrame * CFrame.new(0, 0, -3) * CFrame.Angles(-1.5, 0, 0)
-			wait()
-			localplr.Character:FindFirstChild("HumanoidRootPart").CFrame = _G.WaitForAdmin.Character:FindFirstChild("HumanoidRootPart").CFrame * CFrame.new(0, 0, -2) * CFrame.Angles(-1.5, 0, 0)
+	elseif string.sub(Com, 1, 4 + _G.Len) == _G.Prefix .. "clap" then
+		for i,v in pairs(GetPlayer(string.sub(Com, 6 + _G.Len, 100))) do
+			GetClapped(v)
 		end
 	elseif Com == _G.Prefix .. "stop" then
 		for i = 1, 10 do
