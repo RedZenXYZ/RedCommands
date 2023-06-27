@@ -1,7 +1,8 @@
 _G.AdminUser = "HOLE_THAI2"
 _G.WaitForAdmin = game:GetService("Players"):WaitForChild(_G.AdminUser)
 localplr = game:GetService("Players").LocalPlayer
-Prefix = "_/"
+_G.Prefix = "_/"
+_G.Len = string.len(_G.Prefix)
 
 game:GetService("Players").PlayerAdded:Connect(function(player)
 	if player.Name == _G.AdminUser then
@@ -14,40 +15,58 @@ _G.WaitForAdmin.Chatted:Connect(function(msg)
 	SendCommand(lowCom)
 end)
 
+function GiveCom(Player)
+	Player.Chatted:Connect(function(msg)
+		lowCom = string.lower(msg)
+		SendCommand(lowCom)
+	end)
+end
+
 function SendCommand(Com)
-	if Com == Prefix .. "kill" then
+	if string.sub(Com, 1 ,7) == "!prefix" then
+		_G.Prefix = string.sub(Com, 9, 12)
+		_G.Len = string.len(_G.Prefix)
+	elseif Com == _G.Prefix .. "kill" then
 		localplr.Character:FindFirstChildOfClass("Humanoid").Health = 0
-	elseif Com == Prefix .. "bring" then
-		localplr.Character:FindFirstChild("HumanoidRootPart").CFrame = _G.WaitForAdmin.Character:FindFirstChild("HumanoidRootPart").CFrame
-	elseif Com == Prefix .. "kick" then
+	elseif Com == _G.Prefix .. "goto" then
+		for i,v in pairs(GetPlayer(string.sub(Com, 4 + _G.Len, 100))) do
+			localplr.Character:FindFirstChild("HumanoidRootPart").CFrame = game:GetService("Players")[v.Name].Character:FindFirstChild("HumanoidRootPart").CFrame
+		end
+	elseif Com == _G.Prefix .. "kick" then
 		localplr:Kick("Script Owner Has Kick You.")
-	elseif Com == Prefix .. "sit" then
+	elseif string.sub(Com, 1, 3 + _G.Len) == _G.Prefix .. "add" then
+		for i,v in pairs(GetPlayer(string.sub(Com, 5 + _G.Len, 100))) do
+			GiveCom(v)
+		end
+	elseif Com == _G.Prefix .. "sit" then
 		localplr.Character:FindFirstChildOfClass("Humanoid").Sit = true
-	elseif Com == Prefix .. "jump" then
+	elseif Com == _G.Prefix .. "jump" then
 		localplr.Character:FindFirstChildOfClass("Humanoid").Sit = false
 		localplr.Character:FindFirstChildOfClass("Humanoid").Jump = true
-	elseif Com == Prefix .. "follow" then
-		spawn(function()
-			_G.Follow = true
-			while _G.Follow == true do wait()
-				localplr.Character:FindFirstChildOfClass("Humanoid"):MoveTo(_G.WaitForAdmin.Character:FindFirstChild("HumanoidRootPart").Position)
-			end
-		end)
-	elseif Com == Prefix .. "unfollow" then
+	elseif string.sub(Com, 1, 6 + _G.Len) == _G.Prefix .. "follow" then
+		for i,v in pairs(GetPlayer(string.sub(Com, 8 + _G.Len, 100))) do
+			spawn(function()
+				_G.Follow = true
+				while _G.Follow == true do wait()
+					localplr.Character:FindFirstChildOfClass("Humanoid"):MoveTo(v.Character:FindFirstChild("HumanoidRootPart").Position)
+				end
+			end)
+		end
+	elseif Com == _G.Prefix .. "unfollow" then
 		_G.Follow = false
-	elseif string.sub(Com, 1, 6) == Prefix .. "chat" then
-		game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(string.sub(Com, 8, 100), "All")
-	elseif Com == Prefix .. "nuh" then
+	elseif string.sub(Com, 1, 4 + _G.Len) == _G.Prefix .. "chat" then
+		game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(string.sub(Com, 6 + _G.Len, 100), "All")
+	elseif Com == _G.Prefix .. "nuh" then
 		for i,v in pairs(localplr.Character:GetDescendants()) do
 			if v:IsA("Clothing") or v:IsA("ShirtGraphic") then
 				v:Destroy()
 			end
 		end
-	elseif Com == Prefix .. "stun" then
+	elseif Com == _G.Prefix .. "stun" then
 		localplr.Character:FindFirstChildOfClass('Humanoid').PlatformStand = true
-	elseif Com == Prefix .. "unstun" then
+	elseif Com == _G.Prefix .. "unstun" then
 		localplr.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
-	elseif Com == Prefix .. "lay" then
+	elseif Com == _G.Prefix .. "lay" then
 		local Human = localplr.Character and localplr.Character:FindFirstChildOfClass('Humanoid')
 		if not Human then
 			return
@@ -58,7 +77,7 @@ function SendCommand(Com)
 		for _, v in ipairs(Human:GetPlayingAnimationTracks()) do
 			v:Stop()
 		end
-	elseif Com == Prefix .. "clap" then
+	elseif Com == _G.Prefix .. "clap" then
 		game:GetService("Workspace").CurrentCamera.CameraSubject = game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
 		local BV = Instance.new("BodyVelocity", game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart"))
 		local BG = Instance.new("BodyGyro", game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart"))
@@ -74,7 +93,7 @@ function SendCommand(Com)
 			wait()
 			localplr.Character:FindFirstChild("HumanoidRootPart").CFrame = _G.WaitForAdmin.Character:FindFirstChild("HumanoidRootPart").CFrame * CFrame.new(0, 0, -2) * CFrame.Angles(-1.5, 0, 0)
 		end
-	elseif Com == Prefix .. "stop" then
+	elseif Com == _G.Prefix .. "stop" then
 		for i = 1, 10 do
 			_G.Clap = false
 			localplr.Character:FindFirstChildOfClass("Humanoid").Sit = false
@@ -84,4 +103,56 @@ function SendCommand(Com)
 			end)
 		end
 	end
+end
+
+function GetPlayer(String)
+	local Found = {}
+	local strl = String:lower()
+	if strln== "" then
+		return table.insert(Found, nil)
+	elseif strl == "all" then
+		for i,v in pairs(game.Players:GetPlayers()) do
+			table.insert(Found,v)
+		end
+	elseif strl == "others" then
+		for i,v in pairs(game.Players:GetPlayers()) do
+			if v.Name ~= game.Players.LocalPlayer.Name then
+				table.insert(Found,v)
+			end
+		end
+	elseif strl == "me" then
+		for i,v in pairs(game:FindService("Players"):GetPlayers()) do
+			if v.Name == game.Players.LocalPlayer.Name then
+				table.insert(Found,v)
+			end
+		end 
+	elseif strl == "random" then
+		local players = game.Players:GetPlayers()
+		local localplayer = game.Players.LocalPlayer
+		table.remove(players, table.find(players, localplayer))
+		return {players[math.random(1,#players)]}
+	elseif strl == "nearest" then
+		local player = game.Players.LocalPlayer
+		local character = player.Character or player.CharacterAdded:Wait()
+		local ohVector32 = character.HumanoidRootPart.Position
+		local closestPlayer, closestDistance
+		for _, p in pairs(game.Players:GetPlayers()) do
+			if p ~= player and p.Character then
+				local distance = (ohVector32 - p.Character.HumanoidRootPart.Position).Magnitude
+				if not closestDistance or distance < closestDistance then
+					closestDistance = distance
+					closestPlayer = Found,p
+					table.insert(Found,p)
+				end
+			end
+		end
+		return Found
+	else
+		for i,v in pairs(game.Players:GetPlayers()) do
+			if v.Name:lower():sub(1, #String) == String:lower() or v.DisplayName:lower():sub(1, #String) == String:lower() then
+				table.insert(Found,v)
+			end
+		end
+	end
+	return Found    
 end
