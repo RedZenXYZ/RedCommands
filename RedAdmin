@@ -1,9 +1,17 @@
+if RedLoaded == true then
+	print("Loaded")
+	return
+end
+
+pcall(function()
+	getgenv().RedLoaded = true
+end)
+
 ----- [ Locals ] -----
 
 _G.AdminUser = "HOLE_THAI2"
-_G.WaitForAdmin = game:GetService("Players"):WaitForChild(_G.AdminUser)
 localplr = game:GetService("Players").LocalPlayer
-_G.Prefix = "_/"
+_G.Prefix = "."
 _G.Len = string.len(_G.Prefix)
 
 ----- [ Functions ] -----
@@ -15,8 +23,8 @@ game:GetService("Players").PlayerAdded:Connect(function(player)
 end)
 
 function AddCmd(Message, CmdName, Spawn)
-	CmdLen = string.len(CmdName)
-	if string.sub(Message, 1, CmdLen + _G.Len) == _G.Prefix .. CmdName then
+	ArgsN = string.split(Message, " ")
+	if ArgsN[1] == _G.Prefix .. CmdName then
 		spawn(Spawn)
 	end
 end
@@ -42,8 +50,7 @@ end
 
 function GiveCom(Player)
 	Player.Chatted:Connect(function(msg)
-		lowCom = string.lower(msg)
-		SendCommand(lowCom)
+		SendCommand(string.lower(msg))
 	end)
 end
 
@@ -62,6 +69,7 @@ Args = string.split(Com, " ")
 ----- [ LocalPlayer Commands ] -----
 
 	AddCmd(Com, "jump", function()
+		localplr.Character:FindFirstChildOfClass("Humanoid").PlatformStand = false
 		localplr.Character:FindFirstChildOfClass("Humanoid").Sit = false
 		localplr.Character:FindFirstChildOfClass("Humanoid").Jump = true
 	end)
@@ -72,10 +80,21 @@ Args = string.split(Com, " ")
 		localplr.Character:FindFirstChildOfClass("Humanoid").Health = 0
 	end)
 	AddCmd(Com, "kick", function()
-		localplr:Kick("Script Owner Has Kick You.")
+		localplr:Kick("Fuck You!")
+	end)
+	AddCmd(Com, "rejoin", function()
+		game:GetService("TeleportService"):Teleport(game.PlaceId)
 	end)
 	AddCmd(Com, "stun", function()
 		localplr.Character:FindFirstChildOfClass('Humanoid').PlatformStand = true
+	end)
+	AddCmd(Com, "trip", function()
+		game:GetService("Players").LocalPlayer:FindFirstChildOfClass("Humanoid"):ChangeState(0)
+		if Args[2] == "" then
+			game:GetService("Players").LocalPlayer:FindFirstChild("HumanoidRootPart").Velocity = game:GetService("Players").LocalPlayer:FindFirstChild("HumanoidRootPart").CFrame.LookVector * 30
+		elseif Args[2] ~= "" then
+			game:GetService("Players").LocalPlayer:FindFirstChild("HumanoidRootPart").Velocity = game:GetService("Players").LocalPlayer:FindFirstChild("HumanoidRootPart").CFrame.LookVector * tonumber(Args[2])
+		end
 	end)
 	AddCmd(Com, "lay", function()
 		local Human = localplr.Character and localplr.Character:FindFirstChildOfClass('Humanoid')
@@ -136,6 +155,16 @@ Args = string.split(Com, " ")
 	AddCmd(Com, "clap", function()
 		for i,v in pairs(GetPlayer(Args[2])) do
 			GetClapped(v)
+		end
+	end)
+	AddCmd(Com, "friend", function()
+		for i,v in pairs(GetPlayer(Args[2])) do
+			game:GetService("Players").LocalPlayer:RequestFriendship(v)
+		end
+	end)
+	AddCmd(Com, "unfriend", function()
+		for i,v in pairs(GetPlayer(Args[2])) do
+			game:GetService("Players").LocalPlayer:RevokeFriendship(v)
 		end
 	end)
 
