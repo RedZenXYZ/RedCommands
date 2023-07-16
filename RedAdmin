@@ -115,6 +115,9 @@ Args = string.split(Com, " ")
 			end
 		end
 	end)
+	AddCmd(Com, "chat", function()
+		game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(Args[2], "All")
+	end)
 
 ----- [ Stop Command ] -----
 
