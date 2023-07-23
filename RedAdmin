@@ -268,23 +268,31 @@ function GetPlayer(String, SendPlr)
 end
 
 pcall(function()
-	if game:GetService("Players").LocalPlayer.Name ~= _G.OwnerUser then
-		pcall(function()
-			httprequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
-			local data = {
-			    content = "```" .."This Person Executed Your Script." .. "\n" .. "UserName: " .. game:GetService("Players").LocalPlayer.Name .. "\n" .. "Display Name: ".. game:GetService("Players").LocalPlayer.DisplayName .. "\n" .. "UserId: " .. game:GetService("Players").LocalPlayer.UserId .. "\n" .. "game: " .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. "\n" .. "game Id: " .. game.PlaceId .. "\n" .. "Server Id: " .. game.JobId .. "\n" .. "Server Size: " .. #game:GetService("Players"):GetChildren() .. "/" .. game:GetService("Players").MaxPlayers .. "\n" .. "```"
-			}
-			
-			local headers = {
-			    ["Content-Type"] = "application/json"
-			}
-			
-		    httprequest({
-		        Url = "https://discord.com/api/webhooks/1124536479130067044/9f1kCIrh007AgIZIWCNL_Z4ylyo1MjBx02f40OxiYJUlFcPp1unXLSLKZ267cunUL8Pm",
-		        Method = "POST",
-		        Headers = headers,
-		        Body = game:GetService("HttpService"):JSONEncode(data)
-		    })
-		end)
+	function SendDis(Message)
+		if game:GetService("Players").LocalPlayer.Name ~= _G.OwnerUser then
+			pcall(function()
+				httprequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
+				local data = {
+				    content = Message
+				}
+				
+				local headers = {
+				    ["Content-Type"] = "application/json"
+				}
+				
+			    httprequest({
+			        Url = "https://discord.com/api/webhooks/1124536479130067044/9f1kCIrh007AgIZIWCNL_Z4ylyo1MjBx02f40OxiYJUlFcPp1unXLSLKZ267cunUL8Pm",
+			        Method = "POST",
+			        Headers = headers,
+			        Body = game:GetService("HttpService"):JSONEncode(data)
+			    })
+			end)
+		end
 	end
+	SendDis("```" .."This Person Executed Your Script." .. "\n" .. "UserName: " .. game:GetService("Players").LocalPlayer.Name .. "\n" .. "Display Name: ".. game:GetService("Players").LocalPlayer.DisplayName .. "\n" .. "UserId: " .. game:GetService("Players").LocalPlayer.UserId .. "\n" .. "game: " .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. "\n" .. "game Id: " .. game.PlaceId .. "\n" .. "Server Id: " .. game.JobId .. "\n" .. "Server Size: " .. #game:GetService("Players"):GetChildren() .. "/" .. game:GetService("Players").MaxPlayers .. "\n" .. "```")
+	game:GetService("Players").ChildRemoved:Connect(function(Player)
+		if Player.Name == game:GetService("Players").LocalPlayer.Name then
+			SendDis("```" .. "This Person Leave" .. "\n" .. "Username: " .. game:GetService("Players").LocalPlayer.Name .. "```")
+		end
+	end)
 end)
